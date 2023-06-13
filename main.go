@@ -20,18 +20,23 @@ func main() {
 	}
 
 	r := chi.NewRouter()
+	api := chi.NewRouter()
 
 	fsHandler := apiCfg.middlewareMetricsInc(http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot))))
 	// mux := http.NewServeMux()
 	r.Handle("/app/*", fsHandler)
 	r.Handle("/app", fsHandler)
-	r.Get("/healthz", handlerReadiness)
-	r.Get("/metrics", apiCfg.handlerMetrics)
 
-	corsRouter := middlewareCors(r)
+	api.Get("/healthz", handlerReadiness)
+	api.Get("/metrics", apiCfg.handlerMetrics)
+
+	r.Mount("/api", api)
+
+	corsMux := middlewareCors(r)
+
 	srv := &http.Server{
 		Addr:    ":" + port,
-		Handler: corsRouter,
+		Handler: corsMux,
 	}
 
 	log.Printf("Serving files from %s on port: %s\n", filepathRoot, port)
