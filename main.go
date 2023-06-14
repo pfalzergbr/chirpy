@@ -28,7 +28,12 @@ func main() {
 	router.Handle("/app/*", fsHandler)
 	router.Handle("/app", fsHandler)
 
+	// * API Routes
 	apiRouter.Get("/healthz", handlerReadiness)
+	apiRouter.Post("/validate_chirp", handleValidateChirp)
+
+
+	// * Admin Routes
 	adminRouter.Get("/metrics", apiCfg.handlerMetrics)
 
 	router.Mount("/api", apiRouter)
@@ -44,3 +49,4 @@ func main() {
 	log.Printf("Serving files from %s on port: %s\n", filepathRoot, port)
 	log.Fatal(srv.ListenAndServe())
 }
+
