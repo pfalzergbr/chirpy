@@ -6,12 +6,6 @@ import (
 	"strings"
 )
 
-var profanities = []string{
-	"kerfuffle",
-	"sharbert",
-	"fornax",
-}
-
 func handleChirpsValidate(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Body string `json:"body"`
@@ -34,20 +28,24 @@ func handleChirpsValidate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cleanedBody := cleanProfanities(params.Body)
+	badWords := map[string]struct{}{
+		"kerfuffle": {},
+		"sharbert":  {},
+		"fornax":    {},
+	}
+
+	cleanedBody := cleanProfanities(params.Body, badWords)
 
 	respondWithJSON(w, http.StatusOK, returnVals{
 		CleanedBody: cleanedBody,
 	})
 }
 
-func cleanProfanities(body string) string {
+func cleanProfanities(body string, badWords map[string]struct{}) string {
 	bodyWords := strings.Split(body, " ")
 	for wIdx, w := range bodyWords {
-		for _, p := range profanities {
-			if strings.EqualFold(w, p) {
-				bodyWords[wIdx] = "****"
-			}
+		if _, ok := badWords[strings.ToLower(w)]; ok {
+			bodyWords[wIdx] = "****"
 		}
 	}
 
