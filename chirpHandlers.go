@@ -5,35 +5,29 @@ import (
 	"net/http"
 )
 
-func handleValidateChirp(w http.ResponseWriter, r *http.Request) {
-	type chirpBody struct {
+func handleChirpsValidate(w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
 		Body string `json:"body"`
 	}
-
-	// type chirpValidationResp struct {
-	// 	Error string `json:"error"`
-	// 	Valid bool   `json:"valid"`
-	// }
-
-	w.Header().Add("Content-Type", "application/json")
+	type returnVals struct {
+		Valid bool `json:"valid"`
+	}
 
 	decoder := json.NewDecoder(r.Body)
-	chirp := chirpBody{}
-
-	err := decoder.Decode(&chirp)
+	params := parameters{}
+	err := decoder.Decode(&params)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(`{"error": "Something went wrong"}`))
+		respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
 		return
 	}
 
-	if len(chirp.Body) > 140 {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte(`{"error": "Chirp is too long"}`))
+	const maxChirpLength = 140
+	if len(params.Body) > maxChirpLength {
+		respondWithError(w, http.StatusBadRequest, "Chirp is too long")
 		return
 	}
 
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"valid": true}`))
+	respondWithJSON(w, http.StatusOK, returnVals{
+		Valid: true,
+	})
 }
