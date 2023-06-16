@@ -1,6 +1,7 @@
 package database
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"sync"
@@ -46,5 +47,41 @@ func (db *DB) ensureDB() error {
 		}
 	}
 
+	return nil
+}
+
+func (db *DB) loadDB() (DBStructure, error) {
+	db.mux.RLock()
+	defer db.mux.RUnlock()
+
+	data, err := os.ReadFile(db.path)
+	if err != nil {
+		return DBStructure{}, err
+	}
+
+	dbStruct := DBStructure{}
+	err = json.Unmarshal(data, &dbStruct)
+
+	if err != nil {
+		return DBStructure{}, err
+	}
+
+	return dbStruct, nil
+}
+
+func (db *DB) writeDB(dbStructure DBStructure) error {
+	db.mux.Lock()
+	defer db.mux.Unlock()
+
+	json, err := json.Marshal(dbStructure)
+
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(db.path, []byte(json), 0644)
+	if err != nil {
+		return err
+	}
 	return nil
 }
