@@ -21,3 +21,4 @@ out
 # Go workspace file
 go.work
 thunder-tests/
+database.json
