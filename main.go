@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/pfalzergbr/chirpy/internal/database"
 )
 
 type apiConfig struct {
@@ -19,6 +20,13 @@ func main() {
 	apiCfg := apiConfig{
 		fileserverHits: 0,
 	}
+
+	_, err := database.NewDB(filepathRoot + "/database.json")
+
+	if err != nil {
+		log.Fatalf("Error creating database: %s\n", err)
+	}
+
 
 	router := chi.NewRouter()
 	apiRouter := chi.NewRouter()
