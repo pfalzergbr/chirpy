@@ -17,8 +17,14 @@ type Chirp struct {
 	Body string `json:"body"`
 }
 
+type User struct {
+	Id    int    `json:"id"`
+	Email string `json:"email"`
+}
+
 type DBStructure struct {
 	Chirps map[int]Chirp `json:"chirps"`
+	Users  map[int]User  `json:"users"`
 }
 
 func NewDB(path string) (*DB, error) {
@@ -39,7 +45,7 @@ func (db *DB) ensureDB() error {
 	_, err := os.ReadFile(db.path)
 
 	if err != nil {
-		err := os.WriteFile(db.path, []byte(`{"chirps":{}}`), 0644)
+		err := os.WriteFile(db.path, []byte(`{"chirps":{}, "users":{}}`), 0644)
 		fmt.Printf("File not yet exist: %v\n", err)
 
 		if err != nil {
@@ -57,6 +63,26 @@ func (db *DB) GetChirps() (DBStructure, error) {
 	}
 
 	return dbStruct, nil
+}
+
+func (db *DB) CreateUser(email string) (User, error) {
+	dbStruct, err := db.loadDB()
+	if err != nil {
+		return User{}, err
+	}
+	id := len(dbStruct.Users) + 1
+	user := User{
+		Id:    id,
+		Email: email,
+	}
+
+	dbStruct.Users[id] = user
+
+	err = db.writeDB(dbStruct)
+	if err != nil {
+		return User{}, err
+	}
+	return user, nil
 }
 
 func (db *DB) CreateChirp(body string) (Chirp, error) {
