@@ -50,19 +50,13 @@ func (db *DB) ensureDB() error {
 	return nil
 }
 
-func (db *DB) GetChirps() ([]Chirp, error){
+func (db *DB) GetChirps() (DBStructure, error) {
 	dbStruct, err := db.loadDB()
 	if err != nil {
-		return nil, err
+		return DBStructure{}, err
 	}
 
-	chirps := make([]Chirp, 0, len(dbStruct.Chirps))
-
-	for _, chirp := range dbStruct.Chirps {
-		chirps = append(chirps, chirp)
-	}
-
-	return chirps, nil
+	return dbStruct, nil
 }
 
 func (db *DB) CreateChirp(body string) (Chirp, error) {

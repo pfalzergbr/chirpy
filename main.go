@@ -39,7 +39,8 @@ func main() {
 
 	// * API Routes
 	apiRouter.Get("/healthz", handlerReadiness)
-	apiRouter.Get("/chirps", apiCfg.HandleGetChiprs)
+	apiRouter.Get("/chirps", apiCfg.handleGetChirps)
+	apiRouter.Get("/chirps/{id}", apiCfg.handleGetChirp)
 	apiRouter.Post("/chirps", apiCfg.handlePostChirp)
 
 	// * Admin Routes
