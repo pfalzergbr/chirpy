@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/pfalzergbr/chirpy/internal/database"
 	"golang.org/x/crypto/bcrypt"
@@ -32,15 +31,8 @@ func (cfg apiConfig) handleLoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var expirationTimeInSeconds int
-	if userParams.ExipiresInSeconds != nil {
-		parsedExipiration, err := strconv.Atoi(*userParams.ExipiresInSeconds)
-		if err == nil {
-			expirationTimeInSeconds = parsedExipiration
-		}
-	}
 
-	jwt, err := cfg.createJWT(user.Id, &expirationTimeInSeconds)
+	jwt, err := cfg.createJWT(user.Id, userParams.ExipiresInSeconds)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Could not log in")
 		return

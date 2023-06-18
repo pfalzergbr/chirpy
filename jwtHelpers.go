@@ -13,16 +13,18 @@ type tokenClaims struct {
 	ExpiresAt time.Time `json:"exp"`
 }
 
-func (cfg apiConfig) createJWT(id int, expiresAt *int) (string, error) {
+func (cfg apiConfig) createJWT(id int, expiresAt int) (string, error) {
 	var expirationTime time.Time
 
-	if expiresAt == nil {
-		expirationTime = time.Now().Add(time.Duration(*expiresAt) * time.Second)
-	} else if *expiresAt > 60*60*24 {
+	if expiresAt != 0 {
+		expirationTime = time.Now().Add(time.Duration(expiresAt) * time.Second)
+	} else if expiresAt > 60*60*24 {
 		expirationTime = time.Now().Add(24 * time.Hour)
 	} else {
 		expirationTime = time.Now().Add(24 * time.Hour)
 	}
+
+	fmt.Printf("Expiration time: %v\n", expirationTime)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		Issuer:    "chirpy",

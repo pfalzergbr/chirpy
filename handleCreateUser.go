@@ -8,7 +8,7 @@ import (
 type userBody struct {
 	Email string `json:"email"`
 	Password string `json:"password"`
-	ExipiresInSeconds *string `json:"expires_in_seconds"`
+	ExipiresInSeconds int `json:"expires_in_seconds"`
 }
 
 func (cfg apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request) {
