@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -23,16 +24,16 @@ func main() {
 	const port = "8080"
 
 	db, err := database.NewDB(filepathRoot + "/database.json")
+	if err != nil {
+		log.Fatalf("Error creating database: %s\n", err)
+	}
+
 
 	apiCfg := apiConfig{
 		fileserverHits: 0,
 		db:             db,
 		jwtSecret:      os.Getenv("JWT_SECRET"),
-	}
-
-	if err != nil {
-		log.Fatalf("Error creatin	g database: %s\n", err)
-	}
+	}	
 
 	router := chi.NewRouter()
 	apiRouter := chi.NewRouter()
