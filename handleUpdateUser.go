@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/pfalzergbr/chirpy/internal/database"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (cfg apiConfig) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
@@ -21,8 +22,9 @@ func (cfg apiConfig) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	auth := r.Header.Get("Authorization")
 	token := strings.Split(auth, " ")[1]
-
+	
 	tokenClaims, err := cfg.validateJWT(token)
+
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "Invalid token")
 		return
@@ -34,10 +36,19 @@ func (cfg apiConfig) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(userParams.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not save user data")
+		return
+	}
+
+
+
 	userUpdate := database.User{
 		Id:       tokenClaims.Id,
 		Email:    userParams.Email,
-		Password: userParams.Password,
+		Password: string(hashedPassword),
 	}
 
 	user, err := cfg.db.UpdateUser(tokenClaims.Id, userUpdate)
@@ -52,5 +63,5 @@ func (cfg apiConfig) handleUpdateUser(w http.ResponseWriter, r *http.Request) {
 		Email: user.Email,
 	}
 
-	respondWithJSON(w, http.StatusCreated, sanitizedUser)
+	respondWithJSON(w, http.StatusOK, sanitizedUser)
 }

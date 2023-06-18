@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -40,16 +41,16 @@ func (cfg apiConfig) createJWT(id int, expiresAt *int) (string, error) {
 }
 
 func (cfg apiConfig) validateJWT(tokenString string) (tokenClaims, error) {
-
-	token, err := jwt.ParseWithClaims(tokenString, jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(cfg.jwtSecret), nil
 	})
 
 	if err != nil {
+		fmt.Println(err)
 		return tokenClaims{}, err
 	}
 
-	if claims, ok := token.Claims.(jwt.RegisteredClaims); ok && token.Valid {
+	if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok && token.Valid {
 		id, err := strconv.Atoi(claims.Subject)
 		if err != nil {
 			return tokenClaims{}, err
