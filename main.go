@@ -49,6 +49,7 @@ func main() {
 	apiRouter.Post("/chirps", apiCfg.handlePostChirp)
 
 	apiRouter.Post("/users", apiCfg.handleCreateUser)
+	apiRouter.Put("/users", apiCfg.handleUpdateUser)
 	apiRouter.Post("/login", apiCfg.handleLoginUser)
 
 	// * Admin Routes

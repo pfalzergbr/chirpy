@@ -190,3 +190,35 @@ func (db *DB) GetUserByEmail(email string) (User, error) {
 	}
 	return User{}, fmt.Errorf("User not found")
 }
+
+func (db *DB) GetUserById(id int) (User, error) {
+	dbStruct, err := db.loadDB()
+	if err != nil {
+		return User{}, err
+	}
+
+	user, ok := dbStruct.Users[id]
+
+	if !ok {
+		return User{}, fmt.Errorf("User not found")
+	}
+
+	return user, nil
+}
+
+
+func (db *DB) UpdateUser(id int, user User) (User, error){
+	dbStruct, err := db.loadDB()
+	if err != nil {
+		return User{}, err
+	}
+
+	dbStruct.Users[id] = user
+
+	err = db.writeDB(dbStruct)
+	if err != nil {
+		return User{}, err
+	}
+
+	return user, nil
+}
