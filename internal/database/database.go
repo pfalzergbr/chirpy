@@ -79,7 +79,7 @@ func (db *DB) CreateUser(email string, password string) (UserResponse, error) {
 		return UserResponse{}, err
 	}
 
-	_, err = db.getUserByEmail(email, dbStruct)
+	_, err = db.GetUserByEmail(email)
 
 	if err == nil {
 		return UserResponse{}, fmt.Errorf("user with email %s already exists", email)
@@ -172,7 +172,12 @@ func (db *DB) writeDB(dbStructure DBStructure) error {
 	return nil
 }
 
-func (db *DB) getUserByEmail(email string, dbStruct DBStructure) (User, error) {
+func (db *DB) GetUserByEmail(email string) (User, error) {
+	dbStruct, err := db.loadDB()
+	if err != nil {
+		return User{}, err
+	}
+
 	for _, user := range dbStruct.Users {
 		if user.Email == email {
 			return user, nil

@@ -5,12 +5,12 @@ import (
 	"net/http"
 )
 
-func (cfg apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request) {
-	type userBody struct {
-		Email string `json:"email"`
-		Password string `json:"password"`
-	}
+type userBody struct {
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
 
+func (cfg apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	userParams := userBody{}
 	err := decoder.Decode(&userParams)
