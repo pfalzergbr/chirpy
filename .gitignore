@@ -22,3 +22,5 @@ out
 go.work
 thunder-tests/
 database.json
+
+.env
