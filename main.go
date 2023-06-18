@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -28,12 +27,11 @@ func main() {
 		log.Fatalf("Error creating database: %s\n", err)
 	}
 
-
 	apiCfg := apiConfig{
 		fileserverHits: 0,
 		db:             db,
 		jwtSecret:      os.Getenv("JWT_SECRET"),
-	}	
+	}
 
 	router := chi.NewRouter()
 	apiRouter := chi.NewRouter()
