@@ -8,6 +8,7 @@ import (
 type userBody struct {
 	Email string `json:"email"`
 	Password string `json:"password"`
+	ExipiresInSeconds *string `json:"expires_in_seconds"`
 }
 
 func (cfg apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request) {
@@ -26,6 +27,8 @@ func (cfg apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't create user")
 		return
 	}
+
+	
 
 	respondWithJSON(w, http.StatusCreated, user)
 }

@@ -25,9 +25,14 @@ type User struct {
 	Password string `json:"password"`
 }
 
-type UserResponse struct {
-	Id       int    `json:"id"`
-	Email    string `json:"email"`
+type LoginResponse struct {
+	Id    int    `json:"id"`
+	Email string `json:"email"`
+	Token string `json:"token"`
+}
+type CreateUserResponse struct {
+	Id    int    `json:"id"`
+	Email string `json:"email"`
 }
 
 type DBStructure struct {
@@ -73,16 +78,16 @@ func (db *DB) GetChirps() (DBStructure, error) {
 	return dbStruct, nil
 }
 
-func (db *DB) CreateUser(email string, password string) (UserResponse, error) {
+func (db *DB) CreateUser(email string, password string) (CreateUserResponse, error) {
 	dbStruct, err := db.loadDB()
 	if err != nil {
-		return UserResponse{}, err
+		return CreateUserResponse{}, err
 	}
 
 	_, err = db.GetUserByEmail(email)
 
 	if err == nil {
-		return UserResponse{}, fmt.Errorf("user with email %s already exists", email)
+		return CreateUserResponse{}, fmt.Errorf("user with email %s already exists", email)
 	}
 
 	id := len(dbStruct.Users) + 1
@@ -90,12 +95,12 @@ func (db *DB) CreateUser(email string, password string) (UserResponse, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
-		return UserResponse{}, err
+		return CreateUserResponse{}, err
 	}
 
 	user := User{
-		Id:    id,
-		Email: email,
+		Id:       id,
+		Email:    email,
 		Password: string(hashedPassword),
 	}
 
@@ -103,10 +108,10 @@ func (db *DB) CreateUser(email string, password string) (UserResponse, error) {
 
 	err = db.writeDB(dbStruct)
 	if err != nil {
-		return UserResponse{}, err
+		return CreateUserResponse{}, err
 	}
-	
-	userResponse := UserResponse{
+
+	userResponse := CreateUserResponse{
 		Id:    user.Id,
 		Email: user.Email,
 	}

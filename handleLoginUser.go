@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/pfalzergbr/chirpy/internal/database"
 	"golang.org/x/crypto/bcrypt"
@@ -25,15 +26,30 @@ func (cfg apiConfig) handleLoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userParams.Password))
-	
+
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "Invalid password")
 		return
 	}
 
-	userResponse := database.UserResponse{
+	var expirationTimeInSeconds int
+	if userParams.ExipiresInSeconds != nil {
+		parsedExipiration, err := strconv.Atoi(*userParams.ExipiresInSeconds)
+		if err == nil {
+			expirationTimeInSeconds = parsedExipiration
+		}
+	}
+
+	jwt, err := cfg.createJWT(user.Id, &expirationTimeInSeconds)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Could not log in")
+		return
+	}
+
+	userResponse := database.LoginResponse{
 		Id:    user.Id,
 		Email: user.Email,
+		Token: jwt,
 	}
 
 	respondWithJSON(w, http.StatusOK, userResponse)
