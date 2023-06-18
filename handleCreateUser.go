@@ -8,6 +8,7 @@ import (
 func (cfg apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	type userBody struct {
 		Email string `json:"email"`
+		Password string `json:"password"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -19,7 +20,7 @@ func (cfg apiConfig) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := cfg.db.CreateUser(userParams.Email)
+	user, err := cfg.db.CreateUser(userParams.Email, userParams.Password)
 
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Couldn't create user")
